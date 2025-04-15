@@ -10,7 +10,9 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
-        from . import routes  # load routes
-        db.create_all()       # create DB tables
+        from . import models       # ✅ Load models!
+        from . import routes       # load routes
+        db.create_all()            # create DB tables
 
     return app
+
