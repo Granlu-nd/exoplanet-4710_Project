@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exoplanets</title>
+</head>
+<body>
+    <h1>Exoplanet Search</h1>
+
+    <!-- Search Form -->
+    <form method="get" action="/planets">
+        <label>Name:</label>
+        <input type="text" name="name">
+
+        <label>Min Temp (°C):</label>
+        <input type="number" name="min_temp" step="any">
+
+        <label>Max Temp (°C):</label>
+        <input type="number" name="max_temp" step="any">
+
+        <label>Min Radius:</label>
+        <input type="number" name="min_radius" step="any">
+
+        <label>Max Radius:</label>
+        <input type="number" name="max_radius" step="any">
+
+        <label>Mission:</label>
+        <input type="text" name="mission">
+
+        <button type="submit">🔍 Search</button>
+    </form>
+
+    <hr>
+
+    <!-- Planet Table -->
+    <h2>Results ({{ planets|length }})</h2>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Mass (Earth)</th>
+            <th>Radius (Earth)</th>
+            <th>Orbital Period (days)</th>
+            <th>Temp (°C)</th>
+            <th>Star</th>
+            <th>Star Temp (K)</th>
+            <th>Mission</th>
+            <th>Agency</th>
+        </tr>
+        {% for planet in planets %}
+        <tr>
+            <td>{{ planet.name }}</td>
+            <td>{{ planet.mass or "N/A" }}</td>
+            <td>{{ planet.radius or "N/A" }}</td>
+            <td>{{ planet.orbital_period or "N/A" }}</td>
+            <td>{{ planet.surface_temperature or "N/A" }}</td>
+            <td>{{ planet.star.name if planet.star else "N/A" }}</td>
+            <td>{{ planet.star.temperature if planet.star else "N/A" }}</td>
+            <td>{{ planet.mission.name if planet.mission else "N/A" }}</td>
+            <td>{{ planet.mission.agency if planet.mission else "N/A" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

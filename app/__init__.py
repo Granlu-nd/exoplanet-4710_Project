@@ -5,14 +5,14 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object('config')  # loads config.py
+    app.config.from_object('config')
 
     db.init_app(app)
 
     with app.app_context():
-        from . import models       # ✅ Load models!
-        from . import routes       # load routes
-        db.create_all()            # create DB tables
+        from . import models 
+        from .routes import main
+        app.register_blueprint(main)
+        db.create_all()
 
     return app
-
