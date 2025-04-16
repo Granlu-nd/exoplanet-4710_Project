@@ -1,0 +1,30 @@
+Project Setup--- 4.15//12:30pm//Wyatt G
+- Created project folder structure with:
+    - app/ for the Flask app
+    - models.py, routes.py, __init__.py
+    - run.py to launch the server
+- Created .gitignore, requirements.txt, and initialized Git repo
+- Set up and activated Python virtual environment 
+- Installed dependencies (Flask, Flask-SQLAlchemy, Pandas) -> now in requirements.txt
+
+Database Modeling and Creation--- 4.15//5:00pm//Wyatt G
+- Created models.py with all required tables:
+    - Planet
+    - Star
+    - Missions
+    - StarSystem *not fully populated
+    - Habitability 
+- Defined all relationships and foreign keys
+- Double-checked against functional dependencies and project schema
+- Configured SQLite as the backend (SQLALCHEMY_DATABASE_URI)
+- Ran db.create_all() to generate exoplanets.db
+
+NASA Data Population and Intergration--- 4.15//11:00pm//Wyatt G
+- Used Pandas to:
+    - Read and clean raw CSV data from NASA Exoplanet Archive
+    - Extract relevant columns only
+    - Handle missing/invalid values safely with safe_float()
+Built populate_db.py to:
+    - Insert real planets, stars, and missions into the database
+    - Automatically skip invalid rows with error handling
+    - Keep the DB clean and accurate
