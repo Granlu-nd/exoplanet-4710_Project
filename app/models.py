@@ -7,7 +7,7 @@ class Missions(db.Model):
     launch_year = db.Column(db.Integer, nullable=False) # Launch Year – Yeah of launch (Integer)
     agency = db.Column(db.String(100), nullable=False) # Agency – name of the agency (String)
 
-    planets = db.relationship('Planets', backref='mission', lazy=True)
+    planets = db.relationship('Planet', backref='mission', lazy=True)
 
 class StarSystem(db.Model):
     system_id = db.Column(db.Integer, primary_key=True) # System id – Primary key (Integer)
@@ -30,7 +30,7 @@ class Star(db.Model):
     system_id = db.Column(db.Integer, db.ForeignKey('star_system.system_id')) # Foreign key linking to a star_system -> Each star belongs to one system.
     planets = db.relationship('Planet', backref='star', lazy=True) # Relationship to Planet model
 
-class Planets(db.Model):
+class Planet(db.Model):
     planet_id = db.Column(db.Integer, primary_key=True) # Planet id – Primary key (Integer)
     name = db.Column(db.String(100)) # Name – name of the planet (String)
     mass = db.Column(db.Float) # Mass – mass in kilograms (Float)
@@ -47,7 +47,7 @@ class Planets(db.Model):
     habitability = db.relationship('Habitability', backref='planet', uselist=False) # Relationship to Habitability model
 
 class Habitability(db.Model):
-    planet_id = db.Column(db.Integer, db.ForeignKey('planets.planet_id'), primary_key=True) # Foreign key linking to a planet -> Each habitability record is linked to one planet.
+    planet_id = db.Column(db.Integer, db.ForeignKey('planet.planet_id'), primary_key=True) # Foreign key linking to a planet -> Each habitability record is linked to one planet.
     water_presence = db.Column(db.Boolean) # Water Presence – presence of water (Boolean)
     radiation_exposure = db.Column(db.Float) # Radiation Exposure – radiation exposure in sieverts (Float)
     atmosphere_pressure = db.Column(db.Float) # Atmosphere Pressure – pressure in pascals (Float)
