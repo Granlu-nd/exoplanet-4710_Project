@@ -1,6 +1,6 @@
-from flask import render_template, request
+from flask import render_template, request, flash, redirect, url_for
 from . import db
-from .models import Planet, Missions
+from .models import Planet, Missions, User
 from flask import Blueprint
 from sqlalchemy.orm import joinedload  # 👈 Needed for eager loading
 
@@ -41,3 +41,34 @@ def planets():
     planets = query.limit(200).all()
 
     return render_template('planets.html', planets=planets)
+
+@main.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        role = request.form['role']
+
+        existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
+        if existing_user:
+            flash('Username or email already exists.')
+            return redirect(url_for('main.register'))
+
+        new_user = User(username=username, email=email, role=role)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('User profile created successfully!')
+        return redirect(url_for('main.home'))
+
+    return render_template('register.html')
+
+@main.route('/profile/<username>')
+def profile(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    return render_template('profile.html', user=user)
+
+@main.route('/users')
+def users():
+    all_users = User.query.all()
+    return render_template('users.html', users=all_users)

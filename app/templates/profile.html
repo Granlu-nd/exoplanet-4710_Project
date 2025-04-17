@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ user.username }}'s Profile</title>
+</head>
+<body>
+    <h1>{{ user.username }}'s Profile</h1>
+    <p>Email: {{ user.email }}</p>
+    <p>Role: {{ user.role }}</p>
+
+    <hr>
+    <h2>Studying Planets</h2>
+    {% if user.studying %}
+        <ul>
+            {% for up in user.studying %}
+                <li>
+                    {{ up.planet.name }}{% if up.nickname %} (Nickname: {{ up.nickname }}){% endif %}
+                    {% if up.favorite %}||{% endif %}
+                    {% if up.notes %}
+                        <br><strong>Notes:</strong> {{ up.notes }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No planets yet. 😢</p>
+    {% endif %}
+
+    <br>
+    <a href="/">← Back to Home</a>
+</body>
+</html>

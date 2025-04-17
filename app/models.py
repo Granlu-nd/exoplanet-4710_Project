@@ -54,7 +54,24 @@ class Habitability(db.Model):
     gravity = db.Column(db.Float) # Gravity – gravity in m/s² (Float)
     habitability_score = db.Column(db.Float) # Habitability Score – score based on various factors (Float)
 
+#For user Role Creation 
 
+class User(db.Model):
+    user_id = db.Column(db.Integer, primary_key=True) # User id – Primary key (Integer)
+    username = db.Column(db.String(50), unique=True, nullable=False) # Username – unique username (String)
+    email = db.Column(db.String(100), unique=True, nullable=False) # Email – unique email address (String)
+    role = db.Column(db.String(20), nullable=False)  # store "student" or "researcher"
+    
+    studying = db.relationship('UserPlanet', backref='user', lazy=True) # Relationship to UserPlanet table
 
+class UserPlanet(db.Model):
+    id = db.Column(db.Integer, primary_key=True) # Primary key (Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False) # Foreign key linking to a user (Integer)
+    planet_id = db.Column(db.Integer, db.ForeignKey('planet.planet_id'), nullable=False) # Foreign key linking to a planet (Integer)
 
+    nickname = db.Column(db.String(100)) # Nickname – nickname for the planet (String)
+    favorite = db.Column(db.Boolean, default=False) # Favorite – whether the planet is marked as favorite (Boolean)
+    notes = db.Column(db.Text) # Notes – user notes about the planet (Text)
+
+    planet = db.relationship('Planet', backref='studied_by', lazy=True) 
 

@@ -28,3 +28,13 @@ Built populate_db.py to:
     - Insert real planets, stars, and missions into the database
     - Automatically skip invalid rows with error handling
     - Keep the DB clean and accurate
+
+Frontend Start--- 4.16//6:00pm//Wyatt G
+- No notes yet
+
+User Profile System Added--- 4.16//8:00pm//Wyatt G
+- Created `User` and `UserPlanet` models with relationships to allow planet tracking  
+- Added `/register` route + `register.html` form for user creation (username, email, role)  
+- Built `/profile/<username>` route to display user info and current study list  
+- Set up `/users` route with `users.html` for viewing all public profiles  
+- Going to add-> implement ability for users to add/remove planets from their personal study list (later)
