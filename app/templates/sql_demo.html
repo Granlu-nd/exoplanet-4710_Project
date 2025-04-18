@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SQL Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 40px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: #34495e;
+        }
+
+        p.description {
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        pre {
+            background-color: #f0f0f0;
+            border-left: 4px solid #2980b9;
+            padding: 10px;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+            margin-bottom: 40px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e0e0e0;
+        }
+
+        a.back {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        a.back:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>SQL Demo: JOINs, GROUP BY, Aggregates</h1>
+    <p class="description">This page demonstrates SQL features used in our project, such as <strong>JOINs</strong>, <strong>GROUP BY</strong>, <strong>COUNT</strong>, and <strong>AVG</strong>. Each example includes the query, output, and a short explanation.</p>
+
+    <h2>1. Top 10 Missions by Planet Count</h2>
+    <p class="description">
+        This query joins <code>missions</code> and <code>planet</code>, then groups by mission name to count how many planets each mission discovered. It’s sorted in descending order to show the most productive missions.
+    </p>
+    <pre>
+SELECT missions.name, COUNT(planet.planet_id) AS planet_count
+FROM missions
+JOIN planet ON missions.mission_id = planet.mission_id
+GROUP BY missions.name
+ORDER BY planet_count DESC
+LIMIT 10;
+    </pre>
+    <table>
+        <tr><th>Mission</th><th>Planet Count</th></tr>
+        {% for name, count in mission_counts %}
+        <tr><td>{{ name }}</td><td>{{ count }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>2. Average Surface Temp by Star</h2>
+    <p class="description">
+        This uses a JOIN between <code>star</code> and <code>planet</code>, and groups by star name to calculate the average surface temperature of its planets. This demonstrates use of <strong>AVG</strong> and <strong>GROUP BY</strong>.
+    </p>
+    <pre>
+SELECT star.name, AVG(planet.surface_temperature) AS avg_temp
+FROM star
+JOIN planet ON star.star_id = planet.star_id
+GROUP BY star.name
+ORDER BY avg_temp DESC
+LIMIT 10;
+    </pre>
+    <table>
+        <tr><th>Star</th><th>Average Temp (°C)</th></tr>
+        {% for name, avg in avg_temps %}
+        <tr><td>{{ name }}</td><td>{{ "%.2f"|format(avg) if avg else "N/A" }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>3. Planet Discoveries by Year</h2>
+    <p class="description">
+        This aggregates planet discoveries by year by joining <code>planet</code> and <code>missions</code>, grouping by <code>launch_year</code>, and counting entries. It's a common use of <strong>GROUP BY</strong> with time-based data.
+    </p>
+    <pre>
+SELECT missions.launch_year, COUNT(planet.planet_id)
+FROM missions
+JOIN planet ON missions.mission_id = planet.mission_id
+GROUP BY missions.launch_year
+ORDER BY missions.launch_year;
+    </pre>
+    <table>
+        <tr><th>Year</th><th>Planets Discovered</th></tr>
+        {% for year, count in planets_by_year %}
+        <tr><td>{{ year }}</td><td>{{ count }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <a href="/" class="back">← Back to Home</a>
+</body>
+</html>

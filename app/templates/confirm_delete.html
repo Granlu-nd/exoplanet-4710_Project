@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirm Deletion</title>
+</head>
+<body>
+    <h2>⚠️ Are you sure you want to delete user <strong>{{ user.username }}</strong>?</h2>
+
+    <form method="post">
+        <button type="submit" style="color: red;">Yes, Delete</button>
+        <a href="{{ url_for('main.profile', username=user.username) }}">Cancel</a>
+    </form>
+</body>
+</html>

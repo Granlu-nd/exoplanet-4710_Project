@@ -1,39 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Exoplanets</title>
+    <meta charset="UTF-8">
+    <title>Exoplanet Search</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #1a237e;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 40px;
+        }
+
+        a button {
+            padding: 8px 16px;
+            font-size: 0.9em;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            background-color: #3949ab;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        a button:hover {
+            background-color: #1a237e;
+        }
+
+        form label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        input {
+            margin-right: 20px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e3e3f3;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-count {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Exoplanet Search</h1>
+    <div class="header-bar">
+        <h1>Exoplanet Search</h1>
+        <a href="/"><button>← Back to Home</button></a>
+    </div>
 
-    <!-- Search Form -->
-    <form method="get" action="/planets">
-        <label>Name:</label>
-        <input type="text" name="name">
+    <h2>Filter Exoplanets</h2>
+<form method="get" action="/planets" style="margin-bottom: 30px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end;">
+        <div style="display: flex; flex-direction: column;">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name">
+        </div>
 
-        <label>Min Temp (°C):</label>
-        <input type="number" name="min_temp" step="any">
+        <div style="display: flex; flex-direction: column;">
+            <label for="min_temp">Min Temp (°C):</label>
+            <input type="number" id="min_temp" name="min_temp" step="any">
+        </div>
 
-        <label>Max Temp (°C):</label>
-        <input type="number" name="max_temp" step="any">
+        <div style="display: flex; flex-direction: column;">
+            <label for="max_temp">Max Temp (°C):</label>
+            <input type="number" id="max_temp" name="max_temp" step="any">
+        </div>
 
-        <label>Min Radius:</label>
-        <input type="number" name="min_radius" step="any">
+        <div style="display: flex; flex-direction: column;">
+            <label for="min_radius">Min Radius:</label>
+            <input type="number" id="min_radius" name="min_radius" step="any">
+        </div>
 
-        <label>Max Radius:</label>
-        <input type="number" name="max_radius" step="any">
+        <div style="display: flex; flex-direction: column;">
+            <label for="max_radius">Max Radius:</label>
+            <input type="number" id="max_radius" name="max_radius" step="any">
+        </div>
 
-        <label>Mission:</label>
-        <input type="text" name="mission">
+        <div style="display: flex; flex-direction: column;">
+            <label for="mission">Mission:</label>
+            <input type="text" id="mission" name="mission">
+        </div>
 
-        <button type="submit">🔍 Search</button>
-    </form>
+        <div>
+            <button type="submit" style="margin-top: 24px;">🔍 Search</button>
+        </div>
+    </div>
+</form>
+
 
     <hr>
 
-    <!-- Planet Table -->
-    <h2>Results ({{ planets|length }})</h2>
-    <table border="1">
+    <div class="results-count">
+        Results Found: {{ planets|length }}
+    </div>
+
+    <table>
         <tr>
             <th>Name</th>
             <th>Mass (Earth)</th>
@@ -59,8 +160,5 @@
         </tr>
         {% endfor %}
     </table>
-
-    <br>
-    <a href="/">← Back to Home</a>
 </body>
 </html>

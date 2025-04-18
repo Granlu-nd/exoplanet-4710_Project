@@ -2,6 +2,70 @@
 <html>
 <head>
     <title>User Directory</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
+            background-color: #f4f4f4;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            margin: 10px 0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 1.1em;
+        }
+
+        li a {
+            text-decoration: none;
+            color: #34495e;
+            font-weight: bold;
+        }
+
+        li a:hover {
+            color: #3498db;
+        }
+
+        .no-users {
+            text-align: center;
+            font-size: 1.2em;
+            color: #999;
+        }
+
+        .home-button {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #3949ab;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .home-button:hover {
+            background-color: #303f9f;
+        }
+    </style>
 </head>
 <body>
     <h1>All User Profiles</h1>
@@ -11,16 +75,15 @@
         {% for user in users %}
             <li>
                 <a href="{{ url_for('main.profile', username=user.username) }}">
-                    {{ user.username }} ({{ user.role }})
+                    {{ user.username }} ({{ user.role|capitalize }})
                 </a>
             </li>
         {% endfor %}
         </ul>
     {% else %}
-        <p>No users found 😢</p>
+        <p class="no-users">No users found 😢</p>
     {% endif %}
 
-    <br>
-    <a href="/">← Back to Home</a>
+    <a href="/" class="home-button">← Back to Home</a>
 </body>
 </html>
