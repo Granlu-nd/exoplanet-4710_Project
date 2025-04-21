@@ -141,8 +141,6 @@ def confirm_delete_user(username):
 
     return render_template('confirm_delete.html', user=user)
 
-
-
 # SQL Demo Route
 # This route is for demonstration purposes.
 @main.route('/sql-demo')
@@ -184,3 +182,7 @@ def sql_demo():
         avg_temps=avg_temps,
         planets_by_year=planets_by_year
     )
+
+@main.route('/habitability-hub')
+def habitability_hub():
+    return render_template('habitability_hub.html')
