@@ -183,6 +183,97 @@ def sql_demo():
         planets_by_year=planets_by_year
     )
 
+
+#Advanced Feature: Habitability Fucntions 
+#Route to display habitability Hub page
 @main.route('/habitability-hub')
 def habitability_hub():
     return render_template('habitability_hub.html')
+#Route to display "What if Earth was there?" simulation page
+@main.route('/earth-simulation', methods=['GET', 'POST'])
+def earth_simulation():
+    planets = Planet.query.limit(200).all()
+    result = None
+    warning = None
+
+    if request.method == 'POST':
+        selected_id = request.form.get('planet_id')
+        planet = Planet.query.get(selected_id)
+
+        # Default realistic fallback values
+        radius = planet.radius if planet.radius else 1.0  # Earth radii
+        temp = planet.surface_temperature if planet.surface_temperature else 15  # Earth avg °C
+        mass = planet.mass if planet.mass else 1.0  # Earth mass
+
+        # Check which values were missing
+        missing = []
+        if planet.radius is None:
+            missing.append("Radius")
+        if planet.surface_temperature is None:
+            missing.append("Surface Temp")
+        if planet.mass is None:
+            missing.append("Mass")
+
+        if missing:
+            warning = f"⚠️ Missing data: {', '.join(missing)}. Using default Earth-like values for simulation."
+
+        # Basic logic for result
+        if temp > 60:
+            result = f"🔥 Earth would be scorched! Temperature is {temp}°C — too hot to support life."
+        elif temp < -50:
+            result = f"❄️ Earth would freeze over! Temperature is {temp}°C — way too cold."
+        else:
+            result = f"✅ Earth could possibly survive here! Temperature is {temp}°C, which is within human-tolerable range."
+
+        # You could expand this logic later with radius/mass/etc.
+
+        return render_template("earth_simulation.html", planets=planets, result=result, warning=warning, selected=planet)
+
+    return render_template("earth_simulation.html", planets=planets)
+#Route to display "Danger Index" info page
+@main.route('/danger-index')
+def danger_index():
+    planets = Planet.query.limit(500).all()  # 💡 Up from 200 to 500
+    categorized = {4: [], 3: [], 2: [], 1: [], 0: []}
+
+    def calculate_danger(p):
+        score = 0
+        notes = []
+
+        # Temp Danger
+        if p.surface_temperature is None:
+            score += 1
+            notes.append("Missing temp")
+        elif p.surface_temperature > 60 or p.surface_temperature < -50:
+            score += 2
+            notes.append("Extreme temp")
+
+        # Radius Danger
+        if p.radius is None:
+            score += 1
+            notes.append("Missing radius")
+        elif p.radius < 0.5 or p.radius > 3:
+            score += 1
+            notes.append("Unfavorable radius")
+
+        # Mass Danger
+        if p.mass is None:
+            score += 1
+            notes.append("Missing mass")
+        elif p.mass > 10:
+            score += 1
+            notes.append("Very high mass")
+
+        return min(score, 4), ", ".join(notes)  # Cap score at 4
+
+    for p in planets:
+        score, reasons = calculate_danger(p)
+        categorized[score].append({
+            'name': p.name,
+            'score': score,
+            'notes': reasons
+        })
+
+    return render_template('danger_index.html', categorized=categorized)
+#route to display "Habitability Index" info page
+

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>☣️ Planetary Danger Index</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f4f6f8;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #c0392b;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        .danger-4 th { background-color: #e74c3c; }
+        .danger-3 th { background-color: #e67e22; }
+        .danger-2 th { background-color: #f1c40f; }
+        .danger-1 th { background-color: #27ae60; }
+        .danger-0 th { background-color: #2ecc71; }
+
+        .note {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        h2 {
+            margin-top: 40px;
+        }
+
+        a.button {
+            display: inline-block;
+            background-color: #7f8c8d;
+            color: white;
+            padding: 10px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 30px;
+        }
+
+        a.button:hover {
+            background-color: #636e72;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        .danger-section {
+            display: none;
+        }
+
+        .danger-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>☣️ Planetary Danger Index</h1>
+    <a href="/habitability-hub" class="button" style="position: absolute; top: 20px; right: 20px;">← Back to Habitability Hub</a>
+    <p>The <strong>Danger Index</strong> evaluates the potential risks to human life if we were to attempt settlement or 
+        exploration of a given exoplanet. The score is based on known data points including surface temperature, planetary mass, 
+        radius, and data completeness. The more severe or unknown the environment, the higher the danger score.
+    </p>
+
+    <p><strong>Here's what each level of the Danger Index represents:</strong></p>
+
+    <ul>
+        <li><strong>🔴 Score 4+ – *Extremely Dangerous*</strong><br> Multiple critical issues like extreme heat/cold, gravity extremes, or massive data gaps. Human survival impossible without speculative tech.</li>
+        <li><strong>🟠 Score 3 – *Dangerous*</strong><br> Major red flags like harsh temps, unbreathable air, or massive size. Requires full protective infrastructure to survive.</li>
+        <li><strong>🟡 Score 2 – *Moderate Risk*</strong><br> One serious concern or a few small ones. Might be survivable short-term, but risky without ongoing support.</li>
+        <li><strong>🟢 Score 1 – *Low Risk*</strong><br> Mostly fine, with just one minor hazard. These are prime candidates for deep exploration.</li>
+        <li><strong>✅ Score 0 – *Safe Zone*</strong><br> Closest to Earth-like. All known values fall within ideal habitability range.</li>
+    </ul>
+
+    <label for="scoreSelector"><strong>Show table for score:</strong></label>
+    <select id="scoreSelector" onchange="filterTables()">
+        <option value="all">Show All</option>
+        <option value="score-4">Score 4 – Very Dangerous</option>
+        <option value="score-3">Score 3 – Dangerous</option>
+        <option value="score-2">Score 2 – Moderate Risk</option>
+        <option value="score-1">Score 1 – Low Risk</option>
+        <option value="score-0">Score 0 – Safe Zone</option>
+    </select>
+
+    {% for score in [4, 3, 2, 1, 0] %}
+        {% if categorized[score] %}
+            <section class="danger-section score-{{ score }}">
+                <h2>
+                    {% if score == 4 %} 🔴 Very Dangerous (Score 4+)
+                    {% elif score == 3 %} 🟠 Dangerous (Score 3)
+                    {% elif score == 2 %} 🟡 Moderate Risk (Score 2)
+                    {% elif score == 1 %} 🟢 Low Risk (Score 1)
+                    {% else %} ✅ Safe Zone (Score 0)
+                    {% endif %}
+                </h2>
+
+                <table class="danger-{{ score }}">
+                    <tr>
+                        <th>Planet Name</th>
+                        <th>Danger Score</th>
+                        <th>Issues</th>
+                    </tr>
+                    {% for planet in categorized[score] %}
+                    <tr>
+                        <td>{{ planet.name }}</td>
+                        <td>{{ planet.score }}</td>
+                        <td class="note">{{ planet.notes }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </section>
+        {% endif %}
+    {% endfor %}>
+
+    <script>
+        function filterTables() {
+            const selected = document.getElementById('scoreSelector').value;
+            const sections = document.querySelectorAll('.danger-section');
+
+            sections.forEach(section => {
+                if (selected === 'all') {
+                    section.classList.add('active');
+                } else {
+                    section.classList.toggle('active', section.classList.contains(selected));
+                }
+            });
+        }
+        window.onload = filterTables;
+    </script>
+
+</body>
+</html>
