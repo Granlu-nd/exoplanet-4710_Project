@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🌍 What If Earth Was There?</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fb;
+            padding: 40px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2em;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-bottom: 30px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input, select {
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-left: 5px solid #ffa502;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .result {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 20px;
+            border-left: 5px solid #27ae60;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        .details {
+            font-size: 0.95em;
+            margin-top: 15px;
+            color: #444;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 30px;
+            text-decoration: none;
+            color: #2c3e50;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌍 What If Earth Was There?</h1>
+    <p>Select a planet to simulate swapping Earth’s orbit into that system.</p>
+
+    <form method="POST">
+        <label>Choose a Planet:</label>
+        <select name="planet_id">
+            {% for p in planets %}
+                <option value="{{ p.planet_id }}">{{ p.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Custom Radius (optional):</label>
+        <input type="number" name="custom_radius" step="any" placeholder="e.g. 1.0">
+
+        <label>Custom Surface Temp °C (optional):</label>
+        <input type="number" name="custom_temp" step="any" placeholder="e.g. 15.0">
+
+        <button type="submit">Run Simulation</button>
+    </form>
+
+    {% if warnings %}
+        <div class="warning">
+            ⚠️ {{ warnings|join(" ") }}
+        </div>
+    {% endif %}
+
+    {% if result %}
+        <div class="result">
+            <strong>Simulation Result:</strong>
+            <p>{{ result }}</p>
+
+            <div class="details">
+                <strong>Planet:</strong> {{ planet_data.name }}<br>
+                <strong>Radius:</strong> {{ planet_data.radius }} Earths<br>
+                <strong>Surface Temp:</strong> {{ planet_data.temp }}°C<br>
+                <strong>Star:</strong> {{ planet_data.star }}
+            </div>
+        </div>
+    {% endif %}
+
+    <a href="/habitability-hub">← Back to Habitability Hub</a>
+
+</body>
+</html>

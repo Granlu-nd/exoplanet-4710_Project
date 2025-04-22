@@ -1,0 +1,36 @@
+Showcase SQL Examples---
+
+1. Danger Index Radiation Check (JOIN Showcase)
+- JOIN between Planet and Star, Star temperature used to infer radiation exposure
+
+danger_data = (
+    db.session.query(
+        Planet.name,
+        Planet.surface_temperature,
+        Planet.radius,
+        Planet.mass,
+        Star.temperature.label('star_temp')
+    )
+    .join(Star, Planet.star_id == Star.star_id)
+    .limit(500)
+    .all()
+)
+
+SELECT planet.name, planet.surface_temperature, planet.mass, star.temperature AS star_temp
+FROM planet
+JOIN star ON planet.star_id = star.star_id
+LIMIT 500;
+
+2. User Profile – Planet Count (AGGREGATE Showcase)
+-AGGREGATE function using COUNT to show how many planets the user is studying, 
+based on entries in the UserPlanet table linked to their ID.
+
+planet_count = (
+    db.session.query(func.count(UserPlanet.planet_id))
+    .filter_by(user_id=user.user_id)
+    .scalar()
+)
+
+SELECT COUNT(planet_id)
+FROM user_planet
+WHERE user_id = ;

@@ -2,7 +2,8 @@ from flask import render_template, request, flash, redirect, url_for
 from . import db
 from .models import Planet, Star, Missions, User, UserPlanet
 from flask import Blueprint
-from sqlalchemy.orm import joinedload 
+from sqlalchemy.orm import joinedload
+from sqlalchemy import func 
 
 main = Blueprint('main', __name__)
 
@@ -67,7 +68,14 @@ def register():
 def profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     planets = Planet.query.order_by(Planet.name).limit(200).all()
-    return render_template('profile.html', user=user, planets=planets)
+
+    planet_count = ( # count of planets associated with the user
+    db.session.query(func.count(UserPlanet.planet_id))
+    .filter_by(user_id=user.user_id)
+    .scalar()
+    )
+
+    return render_template('profile.html', user=user, planets=planets, planet_count=planet_count)
 
 @main.route('/users')
 def users():
@@ -190,65 +198,87 @@ def sql_demo():
 def habitability_hub():
     return render_template('habitability_hub.html')
 #Route to display "What if Earth was there?" simulation page
-@main.route('/earth-simulation', methods=['GET', 'POST'])
-def earth_simulation():
+@main.route('/habitability-sim', methods=['GET', 'POST'])
+def habitability_sim():
     planets = Planet.query.limit(200).all()
     result = None
-    warning = None
+    warnings = []
+    planet_data = {}
 
     if request.method == 'POST':
         selected_id = request.form.get('planet_id')
-        planet = Planet.query.get(selected_id)
+        planet = Planet.query.get(int(selected_id))
 
-        # Default realistic fallback values
-        radius = planet.radius if planet.radius else 1.0  # Earth radii
-        temp = planet.surface_temperature if planet.surface_temperature else 15  # Earth avg °C
-        mass = planet.mass if planet.mass else 1.0  # Earth mass
+        # Try to use real data
+        name = planet.name
+        radius = planet.radius
+        temp = planet.surface_temperature
 
-        # Check which values were missing
-        missing = []
-        if planet.radius is None:
-            missing.append("Radius")
-        if planet.surface_temperature is None:
-            missing.append("Surface Temp")
-        if planet.mass is None:
-            missing.append("Mass")
+        # Check if we’re missing data
+        if not radius or not temp:
+            warnings.append("Missing data detected. Please input estimated values or use random Earth-like values.")
 
-        if missing:
-            warning = f"⚠️ Missing data: {', '.join(missing)}. Using default Earth-like values for simulation."
+        # Grab custom input if user filled it out
+        custom_radius = request.form.get('custom_radius')
+        custom_temp = request.form.get('custom_temp')
 
-        # Basic logic for result
-        if temp > 60:
-            result = f"🔥 Earth would be scorched! Temperature is {temp}°C — too hot to support life."
-        elif temp < -50:
-            result = f"❄️ Earth would freeze over! Temperature is {temp}°C — way too cold."
+        # Use overrides or fill with Earth-like defaults
+        try:
+            radius = float(custom_radius) if custom_radius else (radius if radius else 1.0)
+            temp = float(custom_temp) if custom_temp else (temp if temp else 15.0)
+        except ValueError:
+            warnings.append("Invalid custom values. Using default values.")
+
+        # Simulate result
+        if temp > 100 or temp < -50:
+            result = f"🔥 Earth would likely not survive. Temperature is {temp}°C — extreme and dangerous."
+        elif radius > 5:
+            result = f"🌍 Earth might survive the temp ({temp}°C), but gravity from radius {radius} Earths would crush human structures."
         else:
-            result = f"✅ Earth could possibly survive here! Temperature is {temp}°C, which is within human-tolerable range."
+            result = f"✅ Earth could survive. Temp is {temp}°C and radius {radius}x Earth — within survivable ranges."
 
-        # You could expand this logic later with radius/mass/etc.
+        planet_data = {
+            'name': name,
+            'radius': radius,
+            'temp': temp,
+            'star': planet.star.name if planet.star else "Unknown"
+        }
 
-        return render_template("earth_simulation.html", planets=planets, result=result, warning=warning, selected=planet)
-
-    return render_template("earth_simulation.html", planets=planets)
+    return render_template("habitability_sim.html", planets=planets, result=result, planet_data=planet_data, warnings=warnings)
 #Route to display "Danger Index" info page
 @main.route('/danger-index')
 def danger_index():
-    planets = Planet.query.limit(500).all()  # 💡 Up from 200 to 500
+    from sqlalchemy import func
+
+    # JOIN Planet and Star to get star temperature
+    danger_data = (
+        db.session.query(
+            Planet.name,
+            Planet.surface_temperature,
+            Planet.radius,
+            Planet.mass,
+            Star.temperature.label('star_temp')
+        )
+        .join(Star, Planet.star_id == Star.star_id, isouter=True)
+        .limit(500)
+        .all()
+    )
+
     categorized = {4: [], 3: [], 2: [], 1: [], 0: []}
 
     def calculate_danger(p):
         score = 0
         notes = []
 
-        # Temp Danger
+        # Surface Temp
         if p.surface_temperature is None:
             score += 1
             notes.append("Missing temp")
         elif p.surface_temperature > 60 or p.surface_temperature < -50:
             score += 2
-            notes.append("Extreme temp")
+            notes.append("Extreme surface temp")
 
-        # Radius Danger
+        # Radius
         if p.radius is None:
             score += 1
             notes.append("Missing radius")
@@ -256,7 +286,7 @@ def danger_index():
             score += 1
             notes.append("Unfavorable radius")
 
-        # Mass Danger
+        # Mass
         if p.mass is None:
             score += 1
             notes.append("Missing mass")
@@ -264,9 +294,21 @@ def danger_index():
             score += 1
             notes.append("Very high mass")
 
-        return min(score, 4), ", ".join(notes)  # Cap score at 4
+        if p.star_temp is None:
+            score += 1
+            notes.append("Unknown radiation")
+        elif p.star_temp > 7100:
+            score += 1
+            notes.append("VERY High radiation from hot star")
+        elif p.star_temp > 6500:
+            score += 1
+            notes.append("High radiation from hot star")
+        elif p.star_temp < 3700:
+            notes.append("Very cool star (dim) — possible light/energy challenges")
 
-    for p in planets:
+        return min(score, 4), ", ".join(notes)
+
+    for p in danger_data:
         score, reasons = calculate_danger(p)
         categorized[score].append({
             'name': p.name,
@@ -275,5 +317,5 @@ def danger_index():
         })
 
     return render_template('danger_index.html', categorized=categorized)
-#route to display "Habitability Index" info page
+
 
