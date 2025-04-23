@@ -21,6 +21,23 @@ FROM planet
 JOIN star ON planet.star_id = star.star_id
 LIMIT 500;
 
+1a. Earth Sim Radiation Check (JOIN Showcase)
+-JOIN Planet and Star to access star temperature, use that for radiation exposure
+
+planet = (
+    db.session.query(Planet)
+    .options(joinedload(Planet.star)) 
+    .filter_by(planet_id=int(selected_id))
+    .first()
+)
+
+SELECT *
+FROM planet
+LEFT JOIN star ON planet.star_id = star.star_id
+WHERE planet.planet_id = [selected_id]
+LIMIT 1;
+
+
 2. User Profile – Planet Count (AGGREGATE Showcase)
 -AGGREGATE function using COUNT to show how many planets the user is studying, 
 based on entries in the UserPlanet table linked to their ID.

@@ -128,6 +128,12 @@
             <strong>Simulation Result:</strong>
             <p>{{ result }}</p>
 
+            {% if radiation_warning %}
+            <div class="warning" style="margin-top: 10px;">
+                ☢️ {{ radiation_warning }}
+            </div>
+            {% endif %}
+
             <div class="details">
                 <strong>Planet:</strong> {{ planet_data.name }}<br>
                 <strong>Radius:</strong> {{ planet_data.radius }} Earths<br>

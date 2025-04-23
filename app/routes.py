@@ -7,11 +7,11 @@ from sqlalchemy import func
 
 main = Blueprint('main', __name__)
 
-@main.route('/')
+@main.route('/') #done
 def home():
     return render_template('home.html')
 
-@main.route('/planets')
+@main.route('/planets') #done
 def planets():
     name_query = request.args.get('name')
     min_temp = request.args.get('min_temp', type=float)
@@ -43,7 +43,7 @@ def planets():
 
     return render_template('planets.html', planets=planets)
 
-@main.route('/register', methods=['GET', 'POST'])
+@main.route('/register', methods=['GET', 'POST']) #done
 def register():
     if request.method == 'POST':
         username = request.form['username']
@@ -64,7 +64,7 @@ def register():
 
     return render_template('register.html')
 
-@main.route('/profile/<username>')
+@main.route('/profile/<username>') #done
 def profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     planets = Planet.query.order_by(Planet.name).limit(200).all()
@@ -77,12 +77,12 @@ def profile(username):
 
     return render_template('profile.html', user=user, planets=planets, planet_count=planet_count)
 
-@main.route('/users')
+@main.route('/users') #done
 def users():
-    all_users = User.query.all()
+    all_users = User.query.all() # SELECT * FROM user;
     return render_template('users.html', users=all_users)
 
-@main.route('/profile/<username>/add_planet', methods=['POST'])
+@main.route('/profile/<username>/add_planet', methods=['POST']) #done
 def add_planet(username):
     user = User.query.filter_by(username=username).first_or_404()
 
@@ -109,7 +109,7 @@ def add_planet(username):
     flash('Planet added to your study list!')
     return redirect(url_for('main.profile', username=username))
 
-@main.route('/remove_study/<int:study_id>', methods=['POST'])
+@main.route('/remove_study/<int:study_id>', methods=['POST']) #done
 def remove_study(study_id):
     study = UserPlanet.query.get_or_404(study_id)
     username = study.user.username
@@ -118,7 +118,7 @@ def remove_study(study_id):
     flash("Planet removed from study list.")
     return redirect(url_for('main.profile', username=study.user.username))
 
-@main.route('/edit_study/<int:study_id>', methods=['GET', 'POST'])
+@main.route('/edit_study/<int:study_id>', methods=['GET', 'POST']) #done
 def edit_study(study_id):
     study = UserPlanet.query.get_or_404(study_id)
 
@@ -132,7 +132,7 @@ def edit_study(study_id):
 
     return render_template('edit_study.html', study=study)
 
-@main.route('/delete-user/<username>', methods=['GET', 'POST'])
+@main.route('/delete-user/<username>', methods=['GET', 'POST']) #done
 def confirm_delete_user(username):
     user = User.query.filter_by(username=username).first_or_404()
 
@@ -151,7 +151,7 @@ def confirm_delete_user(username):
 
 # SQL Demo Route
 # This route is for demonstration purposes.
-@main.route('/sql-demo')
+@main.route('/sql-demo') #done
 def sql_demo():
     from sqlalchemy import func
 
@@ -194,20 +194,26 @@ def sql_demo():
 
 #Advanced Feature: Habitability Fucntions 
 #Route to display habitability Hub page
-@main.route('/habitability-hub')
+@main.route('/habitability-hub') #done
 def habitability_hub():
     return render_template('habitability_hub.html')
 #Route to display "What if Earth was there?" simulation page
-@main.route('/habitability-sim', methods=['GET', 'POST'])
+@main.route('/habitability-sim', methods=['GET', 'POST']) #done
 def habitability_sim():
     planets = Planet.query.limit(200).all()
     result = None
+    radiation_warning = None
     warnings = []
     planet_data = {}
 
     if request.method == 'POST':
         selected_id = request.form.get('planet_id')
-        planet = Planet.query.get(int(selected_id))
+        planet = (
+            db.session.query(Planet)
+            .options(joinedload(Planet.star)) 
+            .filter_by(planet_id=int(selected_id))
+            .first()
+        )
 
         # Try to use real data
         name = planet.name
@@ -237,6 +243,12 @@ def habitability_sim():
         else:
             result = f"✅ Earth could survive. Temp is {temp}°C and radius {radius}x Earth — within survivable ranges."
 
+        radiation_warning = ""
+        if planet.star and planet.star.temperature:
+            if planet.star.temperature > 4700:
+                radiation_warning = f"☢️ Warning: The host star is extremely hot ({planet.star.temperature} K), suggesting high radiation levels. Earth would need shielding."
+
+
         planet_data = {
             'name': name,
             'radius': radius,
@@ -244,9 +256,9 @@ def habitability_sim():
             'star': planet.star.name if planet.star else "Unknown"
         }
 
-    return render_template("habitability_sim.html", planets=planets, result=result, planet_data=planet_data, warnings=warnings)
+    return render_template("habitability_sim.html", planets=planets, result=result, planet_data=planet_data, warnings=warnings, radiation_warning =radiation_warning)
 #Route to display "Danger Index" info page
-@main.route('/danger-index')
+@main.route('/danger-index') #done
 def danger_index():
     from sqlalchemy import func
 
