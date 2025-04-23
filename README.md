@@ -2,9 +2,9 @@
 Database-driven web app for exploring exoplanets and habitability
 
 ### Group Members
-Wyatt Granlund
-Jonathan Alcineus
-Aiden Bello
+Wyatt Granlund,
+Jonathan Alcineus,
+Aiden Bello,
 Bruno Page
 
 # Setup
