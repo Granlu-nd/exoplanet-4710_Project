@@ -47,4 +47,6 @@ To run the project locally, follow these steps:
    python run.py
    ```
 
-> 💡 After setup, navigate to `http://127.0.0.1:5000`
+## Usage
+
+💡 After setup, navigate to `http://127.0.0.1:5000`
